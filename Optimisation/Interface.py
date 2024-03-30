@@ -2,15 +2,18 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import Int01 as ins
+import Int_funcs as ins
 
-st.set_page_config("Knapsack",page_icon=None,layout="wide")
+st.set_page_config("Knapsack",page_icon="Optimisation/backpack.png",layout="wide")
 
 tab1, tab2, tab3 = st.tabs(["0/1 Knapsack", "Unbound Knapsack","Custom"])
 
+knap_dict = {"Tools":["Hammer","Screw","Towel","Wrench","Screwdriver"]}
+df = pd.DataFrame(knap_dict)
+
 with tab1:
-    ins.zero_one_knap(15)
+    ins.zero_one_knap(knap_dict)
 with tab2:
-    ins.Unbound_knap(15)
+    ins.Unbound_knap()
 with tab3:
-    ins.Custom_knap(15)
+    ins.Custom_knap()

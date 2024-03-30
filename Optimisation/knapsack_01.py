@@ -53,4 +53,5 @@ df_01['Total Values'] = sums
 df_01['Total Weights'] = weights
 
 dfs_01 = df_01[df_01["Total Weights"]<= 15]
-dfs_01.sort_values(by="Total Values",ascending=False).head()
+dfs_01 = dfs_01.sort_values(by="Total Values",ascending=False).head()
+print(dfs_01)
