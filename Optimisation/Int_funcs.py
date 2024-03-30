@@ -18,7 +18,7 @@ def gen_cases(size):
             break
     return cases
 
-def zo(df_01,sack_size):
+def zo(df_01,sack_size,hea):
     size = 2 ** len(df_01.columns)
     cases = gen_cases(size)
     cpt = 1
@@ -78,23 +78,30 @@ def zero_one_knap(kd):
     for j in range(len(weights)):
         if weights[j] == 0 or values[j] == 0:
             torem.append(j)
-    p = 0
-    for s in torem:
-        weights.pop(s-p)
-        values.pop(s-p)
-        kd['Tools'].pop(s-p)
-        p +=1
-
+    hea = 5
+    if len(torem) <5:
+        p = 0
+        for s in torem:
+            weights.pop(s-p)
+            values.pop(s-p)
+            kd['Tools'].pop(s-p)
+            p +=1
+    else:
+        hea = 1
     kd["weights"] = weights
     kd["values"] = values
 
     kd = pd.DataFrame(kd,index=kd['Tools'])
     kd.drop('Tools', axis=1, inplace=True)
     df_01 = kd.transpose().copy()
-    dfs_01 = zo(df_01,sack_size)    
+    dfs_01 = zo(df_01,sack_size,hea)    
 
     with zo_col2.container(height=620):
-        st.dataframe(dfs_01,use_container_width=True)
+        if hea ==1:
+            st.error("All weights (and/or) values are null, fill them to calculate")
+        else:
+            st.dataframe(dfs_01,use_container_width=True)
+
 
 def Unbound_knap():
     unb_col1, unb_col2 = st.columns([1,1],gap="large")
