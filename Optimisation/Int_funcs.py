@@ -18,7 +18,7 @@ def gen_cases(size):
             break
     return cases
 
-def zo(df_01,sack_size,hea):
+def zo(df_01,sack_size):
     size = 2 ** len(df_01.columns)
     cases = gen_cases(size)
     cpt = 1
@@ -48,10 +48,63 @@ def zo(df_01,sack_size,hea):
     dfs_01=dfs_01.sort_values(by=order,ascending=asc).head()
     return dfs_01
 
+def visuals(dfs_01):
+    im1,im2,im3,im4,im5=st.columns([1,1,1,1,1])
+    if "Hammer" in dfs_01:
+        if dfs_01.iloc[0]["Hammer"]>0:
+            im1.image("Optimisation/icons/on_Hammer.png")
+            im1.caption("""<div style="text-align:center"><H1 style="color:#00ff00;">1</H1></div>""", unsafe_allow_html=True)
+        else:
+            im1.image("Optimisation/icons/off_Hammer.png")
+            im1.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    else:
+        im1.image("Optimisation/icons/off_Hammer.png")
+        im1.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    if "Screw" in dfs_01:
+        if dfs_01.iloc[0]["Screw"]>0:
+            im2.image("Optimisation/icons/on_Screw.png")
+            im2.caption("""<div style="text-align:center"><H1 style="color:#00ff00;">1</H1></div>""", unsafe_allow_html=True)
+        else:
+            im2.image("Optimisation/icons/off_Screw.png")
+            im2.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    else:
+        im2.image("Optimisation/icons/off_Screw.png")
+        im2.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    if "Towel" in dfs_01:
+        if dfs_01.iloc[0]["Towel"]>0:
+            im3.image("Optimisation/icons/on_Towel.png")
+            im3.caption("""<div style="text-align:center"><H1 style="color:#00ff00;">1</H1></div>""", unsafe_allow_html=True)
+        else:
+            im3.image("Optimisation/icons/off_Towel.png")
+            im3.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)    
+    else:
+        im3.image("Optimisation/icons/off_Towel.png")
+        im3.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    if "Wrench" in dfs_01:
+        if dfs_01.iloc[0]["Wrench"]>0:
+            im4.image("Optimisation/icons/on_Wrench.png")
+            im4.caption("""<div style="text-align:center"><H1 style="color:#00ff00;">1</H1></div>""", unsafe_allow_html=True)
+        else:
+            im4.image("Optimisation/icons/off_Wrench.png")
+            im4.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    else:
+        im4.image("Optimisation/icons/off_Wrench.png")
+        im4.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    if "Screwdriver" in dfs_01:
+        if dfs_01.iloc[0]["Screwdriver"]>0:
+            im5.image("Optimisation/icons/on_Screwdriver.png")
+            im5.caption("""<div style="text-align:center"><H1 style="color:#00ff00;">1</H1></div>""", unsafe_allow_html=True)
+        else:
+            im5.image("Optimisation/icons/off_Screwdriver.png")
+            im5.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+    else:
+            im5.image("Optimisation/icons/off_Screwdriver.png")
+            im5.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
+
 def zero_one_knap(kd):
     weights = []
     values = []
-    zo_col1, zo_col2 = st.columns([1,1],gap="large")
+    zo_col1, zo_col2 = st.columns([1,1])
     with zo_col1.container(height=620,border=True).form("zero_one",border=False):
         c1,c2=st.columns([1,1])
 
@@ -76,7 +129,7 @@ def zero_one_knap(kd):
 
     torem = []
     for j in range(len(weights)):
-        if weights[j] == 0 or values[j] == 0:
+        if weights[j] == 0 or values[j] == 0 or weights[j]>sack_size:
             torem.append(j)
     hea = 5
     if len(torem) <5:
@@ -94,14 +147,24 @@ def zero_one_knap(kd):
     kd = pd.DataFrame(kd,index=kd['Tools'])
     kd.drop('Tools', axis=1, inplace=True)
     df_01 = kd.transpose().copy()
-    dfs_01 = zo(df_01,sack_size,hea)    
+    dfs_01 = zo(df_01,sack_size)    
 
     with zo_col2.container(height=620):
         if hea ==1:
-            st.error("All weights (and/or) values are null, fill them to calculate")
+            st.error("All weights (and/or) values are null or larger than the sack's size, re-enter acceptable values")
         else:
             st.dataframe(dfs_01,use_container_width=True)
-
+            visuals(dfs_01)
+            max_value = dfs_01['Total Values'].max()
+            count_max_value = dfs_01['Total Values'].eq(max_value).sum()
+            if count_max_value == 1:
+                st.write(f"""<div style="text-align:center">
+                    <p>There is only {count_max_value} optimal solution.</p>
+                    </div>""", unsafe_allow_html=True)
+            else:
+                st.write(f"""<div style="text-align:center">
+                    <p>There are {count_max_value} optimal solutions, the visualization shows one of them.</p>
+                    </div>""", unsafe_allow_html=True)
 
 def Unbound_knap():
     unb_col1, unb_col2 = st.columns([1,1],gap="large")
@@ -169,4 +232,3 @@ def Custom_knap():
     with cu_col2.container(height=620,border=False):
         if cu_submit:
             st.title("Visualization")
-

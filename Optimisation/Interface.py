@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Int_funcs as ins
 
-st.set_page_config("Knapsack",page_icon="Optimisation/backpack.png",layout="wide")
+st.set_page_config("Knapsack",page_icon="Optimisation/icons/backpack.png",layout="wide")
 
 tab1, tab2, tab3 = st.tabs(["0/1 Knapsack", "Unbound Knapsack","Custom"])
 
