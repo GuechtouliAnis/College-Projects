@@ -8,10 +8,10 @@ st.set_page_config("Knapsack",page_icon="Optimisation/icons/backpack.png",layout
 
 tab1, tab2 = st.tabs(["0/1 Knapsack", "Unbound Knapsack"])
 
-knap_dict = {"Tools":["Hammer","Screw","Towel","Wrench","Screwdriver"]}
-df = pd.DataFrame(knap_dict)
+knap_dict1 = {"Tools":["Hammer","Screw","Towel","Wrench","Screwdriver"]}
+knap_dict2 = {"Tools":["Hammer","Screw","Towel","Wrench","Screwdriver"]}
 
 with tab1:
-    ins.zero_one_knap(knap_dict)
+    ins.zero_one_knap(knap_dict1)
 with tab2:
-    ins.Unbound_knap()
+    ins.Unbound_knap(knap_dict2)
