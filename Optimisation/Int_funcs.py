@@ -45,7 +45,11 @@ def zo(df_01,sack_size):
     dfs_01 = dfs_01[dfs_01["Total Weights"]<= sack_size]
     order = ["Total Values","Total Weights"]
     asc = [False,True]
-    dfs_01=dfs_01.sort_values(by=order,ascending=asc).head()
+    dfs_01=dfs_01.sort_values(by=order,ascending=asc)
+    dfs_01.reset_index(drop=True, inplace=True)
+
+    # Adding 1 to index to start from 1 instead of 0
+    dfs_01.index += 1
     return dfs_01
 
 def visuals(dfs_01):
@@ -101,24 +105,32 @@ def visuals(dfs_01):
             im5.image("Optimisation/icons/off_Screwdriver.png")
             im5.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
 
+def get_values(values):
+    values.append(st.number_input("Hammer Value",min_value=0,max_value=40,value=11))
+    values.append(st.number_input("Screw Value",min_value=0,max_value=40,value=4))
+    values.append(st.number_input("Towel Value",min_value=0,max_value=40,value=8))
+    values.append(st.number_input("Wrench Value",min_value=0,max_value=40,value=3))
+    values.append(st.number_input("Screwdriver Value",min_value=0,max_value=40,value=6))
+    return values
+
+def get_weights(weights):
+    weights.append(st.number_input("Hammer Weight",min_value=0,max_value=100,value=3))
+    weights.append(st.number_input("Screw Weight",min_value=0,max_value=100,value=2))
+    weights.append(st.number_input("Towel Weight",min_value=0,max_value=100,value=5))
+    weights.append(st.number_input("Wrench Weight",min_value=0,max_value=100,value=7))
+    weights.append(st.number_input("Screwdriver Weight",min_value=0,max_value=100,value=4))
+    return weights
+
 def zero_one_knap(kd):
     weights = []
     values = []
-    zo_col1, zo_col2 = st.columns([1,1])
+    zo_col1, zo_col2 = st.columns([1,1],gap="large")
     with zo_col1.container(height=620,border=True).form("zero_one",border=False):
         c1,c2=st.columns([1,1])
-
-        values.append(c1.number_input("Hammer Value",min_value=0,max_value=40,value=11))
-        values.append(c1.number_input("Screw Value",min_value=0,max_value=40,value=4))
-        values.append(c1.number_input("Towel Value",min_value=0,max_value=40,value=8))
-        values.append(c1.number_input("Wrench Value",min_value=0,max_value=40,value=3))
-        values.append(c1.number_input("Screwdriver Value",min_value=0,max_value=40,value=6))
-
-        weights.append(c2.number_input("Hammer Weight",min_value=0,max_value=100,value=3))
-        weights.append(c2.number_input("Screw Weight",min_value=0,max_value=100,value=2))
-        weights.append(c2.number_input("Towel Weight",min_value=0,max_value=100,value=5))
-        weights.append(c2.number_input("Wrench Weight",min_value=0,max_value=100,value=7))
-        weights.append(c2.number_input("Screwdriver Weight",min_value=0,max_value=100,value=4))
+        with c1:
+            values = get_values(values)
+        with c2:
+            weights = get_weights(weights)
 
         sack_size = st.number_input("Enter sack size",min_value=1,max_value=100,value=15)
         st.caption("""<div style="text-align:center">
@@ -127,14 +139,14 @@ def zero_one_knap(kd):
         co1,co2,co3 = st.columns([1.5,1,1.5])
         zo_submit = co2.form_submit_button("submit",use_container_width=True)
 
-    torem = []
+    toremove = []
     for j in range(len(weights)):
         if weights[j] == 0 or values[j] == 0 or weights[j]>sack_size:
-            torem.append(j)
+            toremove.append(j)
     hea = 5
-    if len(torem) <5:
+    if len(toremove) <5:
         p = 0
-        for s in torem:
+        for s in toremove:
             weights.pop(s-p)
             values.pop(s-p)
             kd['Tools'].pop(s-p)
@@ -143,7 +155,6 @@ def zero_one_knap(kd):
         hea = 1
     kd["weights"] = weights
     kd["values"] = values
-
     kd = pd.DataFrame(kd,index=kd['Tools'])
     kd.drop('Tools', axis=1, inplace=True)
     df_01 = kd.transpose().copy()
@@ -151,41 +162,29 @@ def zero_one_knap(kd):
 
     with zo_col2.container(height=620):
         if hea ==1:
-            st.error("All weights (and/or) values are null or larger than the sack's size, re-enter acceptable values")
+            st.error("Null (and/or) values or larger than the sack's size, re-enter acceptable values")
         else:
-            st.dataframe(dfs_01,use_container_width=True)
-            visuals(dfs_01)
             max_value = dfs_01['Total Values'].max()
             count_max_value = dfs_01['Total Values'].eq(max_value).sum()
-            if count_max_value == 1:
-                st.write(f"""<div style="text-align:center">
-                    <p>There is only {count_max_value} optimal solution.</p>
-                    </div>""", unsafe_allow_html=True)
+            visuals(dfs_01)
+            first_n_values = dfs_01['Total Weights'].head(count_max_value)
+            are_equal = first_n_values.nunique() == 1
+            if are_equal:
+                st.dataframe(dfs_01.head(count_max_value),use_container_width=True)
             else:
-                st.write(f"""<div style="text-align:center">
-                    <p>There are {count_max_value} optimal solutions, the visualization shows one of them.</p>
-                    </div>""", unsafe_allow_html=True)
+                dfs_01 = dfs_01[dfs_01["Total Weights"] == dfs_01.iloc[0]["Total Weights"]]
+                st.dataframe(dfs_01.head(count_max_value),use_container_width=True)
 
 def Unbound_knap():
     unb_col1, unb_col2 = st.columns([1,1],gap="large")
-    with unb_col1.container(height=620,border=False).form("unbound_form"):
+    with unb_col1.container(height=620,border=True).form("unbound_form",border=False):
+        values = weights = []
         c1,c2=st.columns([1,1])
-
-        unb_ham_w = c1.number_input("Hammer Weight",min_value=0,max_value=100)
-        unb_ham_v = c2.number_input("Hammer Value",min_value=0,max_value=40)
-
-        unb_scr_w = c1.number_input("Screw Weight",min_value=0,max_value=100)
-        unb_scr_v = c2.number_input("Screw Value",min_value=0,max_value=40)
-
-        unb_tow_w = c1.number_input("Towel Weight",min_value=0,max_value=100)
-        unb_tow_v = c2.number_input("Towel Value",min_value=0,max_value=40)
-
-        unb_wre_w = c1.number_input("Wrench Weight",min_value=0,max_value=100)
-        unb_wre_v = c2.number_input("Wrench Value",min_value=0,max_value=40)
-
-        unb_sd_w = c1.number_input("Screwdriver Weight",min_value=0,max_value=100)
-        unb_sd_v = c2.number_input("Screwdriver Value",min_value=0,max_value=40)
-        unb_sack_weight = st.number_input("Enter sack size",min_value=1,max_value=100)
+        with c1:
+            values = get_values(values)
+        with c2:
+            weights = get_weights(weights)
+        unb_sack_weight = st.number_input("Enter sack size",min_value=1,max_value=100,value=15)
 
         st.caption("""<div style="text-align:center">
                     <p>Click submit to calculate the best case</p>
@@ -193,42 +192,7 @@ def Unbound_knap():
         co1,co2,co3 = st.columns([1.5,1,1.5])
         unb_submit = co2.form_submit_button("submit",use_container_width=True)
 
-    with unb_col2.container(height=620,border=False):
-        if unb_submit:
-            st.title("Visualization")
+    # The calculations for unbound Knapsack
 
-def Custom_knap():
-    cu_col1, cu_col2 = st.columns([1,1],gap="large")
-    with cu_col1.container(height=620,border=False).form("Custom_K"):
-        c1,c2,c3=st.columns([1,1,1])
-        cu_ham_w = c1.number_input("Hammer Weight",min_value=0,max_value=100)
-        cu_ham_v = c2.number_input("Hammer Value",min_value=0,max_value=40)
-        cu_ham_q = c3.number_input("Hammer Quantity",min_value=0,max_value=15)
-
-        cu_scr_w = c1.number_input("Screw Weight",min_value=0,max_value=100)
-        cu_scr_v = c2.number_input("Screw Value",min_value=0,max_value=40)
-        cu_scr_q = c3.number_input("Screw Quantity",min_value=0,max_value=15)
-
-        cu_tow_w = c1.number_input("Towel Weight",min_value=0,max_value=100)
-        cu_tow_v = c2.number_input("Towel Value",min_value=0,max_value=40)
-        cu_tow_q = c3.number_input("Towel Quantity",min_value=0,max_value=15)
-
-        cu_wre_w = c1.number_input("Wrench Weight",min_value=0,max_value=100)
-        cu_wre_v = c2.number_input("Wrench Value",min_value=0,max_value=40)
-        cu_wre_q = c3.number_input("Wrench Quantity",min_value=0,max_value=15)
-
-        cu_sd_w = c1.number_input("Screwdriver Weight",min_value=0,max_value=100)
-        cu_sd_v = c2.number_input("Screwdriver Value",min_value=0,max_value=40)
-        cu_sd_q = c3.number_input("Screwdriver Quantity",min_value=0,max_value=15)
-
-        cu_sack_weight = st.number_input("Enter sack size",min_value=1,max_value=100)
-
-        st.caption("""<div style="text-align:center">
-                    <p>Click submit to visualize</p>
-                    </div>""", unsafe_allow_html=True)
-        co1,co2,co3 = st.columns([1.5,1,1.5])
-        cu_submit = co2.form_submit_button("submit",use_container_width=True)
-
-    with cu_col2.container(height=620,border=False):
-        if cu_submit:
-            st.title("Visualization")
+    with unb_col2.container(height=620,border=True):
+        st.title("Visualization")
