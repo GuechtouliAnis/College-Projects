@@ -1,0 +1,17 @@
+# 1. Empty knapsack (capacity = 0)
+# 2. All items have zero weight
+# 3. All items have zero value
+# 4. All items have zero weight and zero value
+# 5. All items have the same weight
+# 6. All items have the same value
+# 19. Knapsack capacity is less than the weight of any single item
+# 20. Knapsack capacity is greater than the sum of weights of all items
+# 21. Knapsack capacity is equal to the sum of weights of all items
+# 26. Infeasible knapsack problem (no feasible solution)
+# 28. Infinite capacity (unbounded knapsack)
+
+
+# 27. Multiple optimal solutions
+
+# 32. Select which algorithm to solve with
+        My Algo, Greedy, GEKKO

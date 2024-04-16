@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from itertools import product
 
+#Done
 def get_values(values):
     values.append(st.number_input("Hammer Value",min_value=0,max_value=40,value=7))
     values.append(st.number_input("Screw Value",min_value=0,max_value=40,value=5))
@@ -11,6 +12,7 @@ def get_values(values):
     values.append(st.number_input("Screwdriver Value",min_value=0,max_value=40,value=6))
     return values
 
+#Done
 def get_weights(weights):
     weights.append(st.number_input("Hammer Weight",min_value=0,max_value=100,value=3))
     weights.append(st.number_input("Screw Weight",min_value=0,max_value=100,value=2))
@@ -199,6 +201,7 @@ def visuals(dfs_01):
             im5.image("Optimisation/icons/off_Screwdriver.png")
             im5.caption(f"""<div style="text-align:center"><H1>0</H1></div>""", unsafe_allow_html=True)
 
+#Done
 def zero_one_knap(kd):
     weights = []
     values = []
@@ -279,3 +282,5 @@ def Unbound_knap(kd):
                 else:
                     st.dataframe(dfs1.head(count_max_value),use_container_width=True)
 
+def knapsack_int(knap_dict0):
+    pass

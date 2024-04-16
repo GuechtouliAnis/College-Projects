@@ -1,5 +1,5 @@
 After installing the requirements by running "pip install -r Optimisation/requirements.txt"
-in your command shell, you have to start the app using "streamlit run Optimisation/Interface.py".
+in your command shell, you have to start the app using "streamlit run Optimisation/Knap.py".
 
 
 Of if you're inside "Optimisation" directory:
