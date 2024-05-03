@@ -40,7 +40,7 @@ def visualize(df):
         return ["on", "#00ff00"] if df.iloc[0][item] > 0 else ["off", "#aaa"]
 
     items = ['Hammer', 'Screw', 'Towel', 'Wrench', 'Screwdriver']
-    state_images = {item: f"Optimisation/icons/{get_state(item)[0]}_{item}.png" for item in items}
+    state_images = {item: f"icons/{get_state(item)[0]}_{item}.png" for item in items}
     columns = st.columns([1, 1, 1, 1, 1])
 
     for item, col in zip(items, columns):
